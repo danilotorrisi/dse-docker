@@ -21,7 +21,8 @@ if [ "$1" = 'dse' -a "$2" = 'cassandra' ]; then
   # Because we want to run DSE over Rancher, we cannot use the hostname --ip-address to retrieve the listen and broadcast
   # address because it would return the internal docker address. Instead we use the hostname --ip-addresses or hostname -I
   # and pick the second ip address which is always the external ( rancher ) ip address.
-  IP_ADDRESSES=`hostname -I`
+  HOSTNAME=`hostname -I`
+  IP_ADDRESSES=($HOSTNAME)
   RANCHER_ADDRESS=${IP_ADDRESSES[1]} 
 
   # LISTEN_ADDRESS is where we listen for other nodes who want to communicate. 'auto' is not a valid value here,
