@@ -17,19 +17,25 @@ if [ "$1" = 'dse' -a "$2" = 'cassandra' ]; then
   # RPC_ADDRESS is where we listen for drivers/clients to connect to us. Setting to 0.0.0.0 by default is fine
   # since we'll be specifying the BROADCAST_RPC_ADDRESS below 
   : ${RPC_ADDRESS='0.0.0.0'}
+  
+  # Because we want to run DSE over Rancher, we cannot use the hostname --ip-address to retrieve the listen and broadcast
+  # address because it would return the internal docker address. Instead we use the hostname --ip-addresses or hostname -I
+  # and pick the second ip address which is always the external ( rancher ) ip address.
+  IP_ADDRESSES=`hostname -I`
+  RANCHER_ADDRESS=${IP_ADDRESSES[1]} 
 
   # LISTEN_ADDRESS is where we listen for other nodes who want to communicate. 'auto' is not a valid value here,
   # so use the hostname's IP by default
   : ${LISTEN_ADDRESS='auto'}
   if [ "$LISTEN_ADDRESS" = 'auto' ]; then
-    LISTEN_ADDRESS="$(hostname --ip-address)"
+    LISTEN_ADDRESS=${RANCHER_ADDRESS}
   fi
 
   # BROADCAST_ADDRESS is where we tell other nodes to communicate with us. Again, 'auto' is not a valid value here,
   # so default to the LISTEN_ADDRESS or the hostname's IP address if set to 'auto'
   : ${BROADCAST_ADDRESS="$LISTEN_ADDRESS"}
   if [ "$BROADCAST_ADDRESS" = 'auto' ]; then
-    BROADCAST_ADDRESS="$(hostname --ip-address)"
+    BROADCAST_ADDRESS=${RANCHER_ADDRESS}
   fi
   
   # By default, tell drivers/clients to use the same address that other nodes are using to communicate with us
