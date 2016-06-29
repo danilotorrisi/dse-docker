@@ -23,13 +23,14 @@ if [ "$1" = 'dse' -a "$2" = 'cassandra' ]; then
   # and pick the second ip address which is always the external ( rancher ) ip address.
   HOSTNAME=`hostname -I`
   IP_ADDRESSES=($HOSTNAME)
+  LOCAL_ADDRESS=${IP_ADDRESSES[2]}
   RANCHER_ADDRESS=${IP_ADDRESSES[1]} 
 
   # LISTEN_ADDRESS is where we listen for other nodes who want to communicate. 'auto' is not a valid value here,
   # so use the hostname's IP by default
   : ${LISTEN_ADDRESS='auto'}
   if [ "$LISTEN_ADDRESS" = 'auto' ]; then
-    LISTEN_ADDRESS=${RANCHER_ADDRESS}
+    LISTEN_ADDRESS=${LOCAL_ADDRESS}
   fi
 
   # BROADCAST_ADDRESS is where we tell other nodes to communicate with us. Again, 'auto' is not a valid value here,
